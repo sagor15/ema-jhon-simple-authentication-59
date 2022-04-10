@@ -1,13 +1,17 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useCreateUserWithEmailAndPassword } from "react-firebase-hooks/auth";
+import auth from "../../firebase.init";
 import "./SingUp.css";
+import { createUserWithEmailAndPassword } from "firebase/auth";
 
 const SingUp = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
-
+  const [createUserWithEmailAndPassword, user] = useCreateUserWithEmailAndPassword(auth);
+  const navigate = useNavigate();
   const handleEmail = (e) => {
     setEmail(e.target.value);
   };
@@ -19,12 +23,21 @@ const SingUp = () => {
   const handleConfirmPassword = (e) => {
     setConfirmPassword(e.target.value);
   };
+
+  if (user) {
+    navigate("/shop");
+  }
   const handleCreateUser = (e) => {
     e.preventDefault();
     if (password !== confirmPassword) {
       setError("Your two password didn't match ");
       return;
     }
+    if (password.length < 6) {
+      setError("password must be 6 characters");
+      return;
+    }
+    createUserWithEmailAndPassword(email, password);
   };
   return (
     <div className="form-container">
